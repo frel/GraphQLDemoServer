@@ -10,7 +10,6 @@ import graphql.schema.DataFetcher
 import graphql.schema.StaticDataFetcher
 import graphql.validation.ValidationError
 import graphql.validation.ValidationErrorType
-import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
@@ -89,10 +88,6 @@ fun main(args: Array<String>) {
     }
 }
 
-fun debug(call: ApplicationCall) {
-    val a = 1
-}
-
 private fun versionFetcher() = "version" to StaticDataFetcher(VERSION)
 
 private fun itemFetcher() = "item" to DataFetcher {
@@ -114,8 +109,7 @@ private fun allItemsFetcher() = "allItems" to DataFetcher {
     } else {
         DataFetcherResult(MockData.items, emptyList())
     }
-    // TODO legg til offset. Da har vi paginering
-
+    // TODO For pagination add offset. See GitHub GraphQL API
 }
 
 
