@@ -2,14 +2,15 @@ package com.subgarden.backend.graphql
 
 import graphql.ExecutionResult
 import graphql.GraphQL
+import graphql.execution.AsyncExecutionStrategy
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLSchema
+import graphql.schema.TypeResolver
 import graphql.schema.idl.RuntimeWiring.newRuntimeWiring
 import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
+import graphql.schema.idl.TypeRuntimeWiring
 import kotlinx.coroutines.experimental.future.await
-import graphql.execution.AsyncExecutionStrategy
-
 
 
 class GraphQLHandler(private val schema: GraphQLSchema) {
@@ -18,18 +19,29 @@ class GraphQLHandler(private val schema: GraphQLSchema) {
             this(schema(schema, resolvers))
 
     companion object {
+
+        var typeResolver: TypeResolver = TypeResolver { env ->
+            val javaObject = env.getObject<Any>()
+            when (javaObject) {
+                is MockWallpaper -> env.schema.getObjectType("Wallpaper")
+                is MockAudio -> env.schema.getObjectType("Audio")
+                else -> env.schema.getObjectType("Item")
+            }
+        }
         fun schema(schema: String, resolvers: Map<String, List<Pair<String, DataFetcher<*>>>>) : GraphQLSchema {
             val typeDefinitionRegistry = SchemaParser().parse(schema)
 
-            // TODO cleanup this mess.
             val runtimeWiring = newRuntimeWiring()
                     .apply {
-                        resolvers.forEach {
-                            (type, fields) -> this.type(type) { builder -> fields.forEach {
-                            (field, resolver) -> builder.dataFetcher(field, resolver)
+                        type(TypeRuntimeWiring.newTypeWiring("Item").typeResolver(typeResolver).build())
+                        resolvers.forEach { (type, fields) ->
+                            type(type) { builder ->
+                                fields.forEach { (field, resolver) ->
+                                    builder.dataFetcher(field, resolver)
+                                }
+                                builder }
                         }
-                            builder }
-                        }
+
                     }.build()
 
             return SchemaGenerator().makeExecutableSchema(typeDefinitionRegistry, runtimeWiring)

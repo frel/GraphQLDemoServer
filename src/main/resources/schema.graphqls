@@ -5,15 +5,52 @@ schema {
 }
 
 type Query {
-    version: String!
-    hello(what: String = "World"): String!
     item(id: ID!): Item
-    allItems(first: Int, last: Int): [Item]!
+    items: [Item]!
+    version: String
 }
 
-type Item {
-    id: ID!
-    name: String!
-    thumbnail: String!
+input ImageSize {
+    height: Int
+    width: Int
 }
 
+interface Item {
+    uuid: ID!
+    title: String!
+    ctype: Int!
+    tags: [String!]!
+    description: String
+    subtitle: String
+    creation_time: String
+    owner_uuid: ID!
+}
+
+type Wallpaper implements Item {
+    uuid: ID!
+    title: String!
+    ctype: Int!
+    tags: [String!]!
+    description: String
+    subtitle: String
+    creation_time: String
+    owner_uuid: ID!
+    imageUrl: String
+    microThumb: String
+    width: Int!
+    height: Int!
+}
+
+type Audio implements Item {
+    uuid: ID!
+    title: String!
+    ctype: Int!
+    tags: [String!]!
+    description: String
+    subtitle: String
+    creation_time: String
+    owner_uuid: ID!
+    streamUri: String
+    duration: Float
+    audioFlowerUrl: String
+}
