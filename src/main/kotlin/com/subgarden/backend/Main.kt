@@ -85,12 +85,7 @@ fun main() {
                     val variables = request.variables ?: emptyMap()
                     val result = handler.execute(query, variables)
 
-                    call.respond(
-                        mapOf(
-                            "data" to result.getData<Any>(),
-                            "errors" to result.errors
-                        )
-                    )
+                    call.respond(result.toSpecification())
                 }
             }
         }
