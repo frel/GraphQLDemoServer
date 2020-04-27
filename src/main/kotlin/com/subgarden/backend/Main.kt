@@ -2,6 +2,7 @@ package com.subgarden.backend
 
 import com.subgarden.backend.graphql.GraphQLHandler
 import com.subgarden.backend.graphql.GraphQLRequest
+import com.subgarden.backend.graphql.MockItem
 import com.subgarden.backend.types.db.MockData
 import com.subgarden.backend.util.asResourceFile
 import graphql.execution.DataFetcherResult
@@ -23,17 +24,16 @@ import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 
 const val GRAPHQL_SCHEMA = "schema.graphqls"
-const val VERSION = "0.0.1"
-const val IP_ADDRESS = "10.42.11.106"
+const val VERSION = "0.0.2"
+const val IP_ADDRESS = "192.168.0.10"
 const val PORT = "8080"
 
-fun main(args: Array<String>) {
-
+fun main() {
 
     // Lazy init
     MockData.items
@@ -43,10 +43,12 @@ fun main(args: Array<String>) {
         val schema = GRAPHQL_SCHEMA.asResourceFile.readText()
 
         val fetchers = mapOf(
-                "Query" to listOf(
-                        versionFetcher(),
-                        itemFetcher(),
-                        allItemsFetcher()))
+            "Query" to listOf(
+                versionFetcher(),
+                itemFetcher(),
+                allItemsFetcher()
+            )
+        )
 
         val handler = GraphQLHandler(schema, fetchers)
 
@@ -76,12 +78,19 @@ fun main(args: Array<String>) {
                     }
                 }
 
+                @Suppress("USELESS_ELVIS")
                 post("/graphql") {
                     val request = call.receive<GraphQLRequest>()
-                    val result = handler.execute(request.query, request.variables)
+                    val query = request.query ?: ""
+                    val variables = request.variables ?: emptyMap()
+                    val result = handler.execute(query, variables)
 
-                    call.respond(mapOf("data" to result.getData<Any>(),
-                            "errors" to result.errors))
+                    call.respond(
+                        mapOf(
+                            "data" to result.getData<Any>(),
+                            "errors" to result.errors
+                        )
+                    )
                 }
             }
         }
@@ -97,7 +106,11 @@ private fun itemFetcher() = "item" to DataFetcher { env ->
 }
 
 private fun allItemsFetcher() = "items" to DataFetcher {
-    DataFetcherResult(MockData.items, emptyList())
+    DataFetcherResult
+        .newResult<List<MockItem>>()
+        .data(MockData.items)
+        .errors(emptyList())
+        .build()
 }
 
 

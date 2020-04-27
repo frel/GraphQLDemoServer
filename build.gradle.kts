@@ -1,6 +1,5 @@
-import org.jetbrains.kotlin.config.KotlinCompilerVersion
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.subgarden"
 version = "0.5-SNAPSHOT"
@@ -10,17 +9,17 @@ val ktorVersion = extra["ktorVersion"] as String
 val graphqlJavaVersion = extra["graphqlJavaVersion"] as String
 
 plugins {
-    kotlin("jvm") version "1.2.61"
-    java
+    kotlin("jvm") version "1.3.72"
     application
+    java
 }
 
 @Suppress("UNUSED_VARIABLE")
 buildscript {
 
-    val ktorVersion by extra { "0.9.3" }
-    val kotlinVersion by extra { "1.2.61" }
-    val graphqlJavaVersion by extra { "9.0" }
+    val ktorVersion by extra { "1.3.2" }
+    val kotlinVersion by extra { "1.3.72" }
+    val graphqlJavaVersion by extra { "14.0" }
 
     repositories {
         maven { url = uri("https://dl.bintray.com/kotlin/ktor") }
@@ -30,6 +29,10 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 application {
@@ -51,9 +54,6 @@ repositories {
     maven { url = uri("https://dl.bintray.com/kotlin/ktor") }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
 
 dependencies {
     implementation(kotlin("stdlib-jdk8", kotlinVersion))

@@ -10,7 +10,7 @@ import graphql.schema.idl.RuntimeWiring.newRuntimeWiring
 import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeRuntimeWiring
-import kotlinx.coroutines.experimental.future.await
+import kotlinx.coroutines.future.await
 
 
 class GraphQLHandler(private val schema: GraphQLSchema) {
@@ -21,8 +21,7 @@ class GraphQLHandler(private val schema: GraphQLSchema) {
     companion object {
 
         var typeResolver: TypeResolver = TypeResolver { env ->
-            val javaObject = env.getObject<Any>()
-            when (javaObject) {
+            when (env.getObject<Any>()) {
                 is MockWallpaper -> env.schema.getObjectType("Wallpaper")
                 is MockAudio -> env.schema.getObjectType("Audio")
                 else -> env.schema.getObjectType("Item")
