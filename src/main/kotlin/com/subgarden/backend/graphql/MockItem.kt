@@ -8,8 +8,8 @@ interface MockItem {
     val tags: List<String>
     val description: String?
     val subtitle: String?
-    val creation_time: String?
-    val owner_uuid: String
+    val creationTime: String?
+    val ownerUuid: String
 }
 
 data class MockWallpaper(
@@ -19,8 +19,8 @@ data class MockWallpaper(
         override val tags: List<String>,
         override val description: String?,
         override val subtitle: String?,
-        override val creation_time: String?,
-        override val owner_uuid: String,
+        override val creationTime: String?,
+        override val ownerUuid: String,
         val imageUrl: String,
         val microThumb: String,
         val width: Int,
@@ -33,8 +33,8 @@ data class MockAudio(
         override val tags: List<String>,
         override val description: String?,
         override val subtitle: String?,
-        override val creation_time: String?,
-        override val owner_uuid: String,
+        override val creationTime: String?,
+        override val ownerUuid: String,
         val streamUri: String?,
         val duration: Float?,
         val audioFlowerUrl: String?) : MockItem

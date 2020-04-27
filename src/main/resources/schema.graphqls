@@ -22,8 +22,8 @@ interface Item {
     tags: [String!]!
     description: String
     subtitle: String
-    creation_time: String
-    owner_uuid: ID!
+    creationTime: String
+    ownerUuid: ID!
 }
 
 type Wallpaper implements Item {
@@ -33,8 +33,8 @@ type Wallpaper implements Item {
     tags: [String!]!
     description: String
     subtitle: String
-    creation_time: String
-    owner_uuid: ID!
+    creationTime: String
+    ownerUuid: ID!
     imageUrl: String
     microThumb: String
     width: Int!
@@ -48,8 +48,8 @@ type Audio implements Item {
     tags: [String!]!
     description: String
     subtitle: String
-    creation_time: String
-    owner_uuid: ID!
+    creationTime: String
+    ownerUuid: ID!
     streamUri: String
     duration: Float
     audioFlowerUrl: String
