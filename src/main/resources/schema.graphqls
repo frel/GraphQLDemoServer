@@ -6,7 +6,7 @@ schema {
 
 type Query {
     item(id: ID!): Item
-    items: [Item]!
+    items(first: Int): [Item]!
     version: String
 }
 
@@ -35,7 +35,7 @@ type Wallpaper implements Item {
     subtitle: String
     creationTime: String
     ownerUuid: ID!
-    imageUrl: String
+    imageUrl: String!
     microThumb: String
     width: Int!
     height: Int!

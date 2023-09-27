@@ -20,7 +20,7 @@ class GraphQLHandler(private val schema: GraphQLSchema) {
 
     companion object {
 
-        var typeResolver: TypeResolver = TypeResolver { env ->
+        private var typeResolver: TypeResolver = TypeResolver { env ->
             when (env.getObject<Any>()) {
                 is MockWallpaper -> env.schema.getObjectType("Wallpaper")
                 is MockAudio -> env.schema.getObjectType("Audio")

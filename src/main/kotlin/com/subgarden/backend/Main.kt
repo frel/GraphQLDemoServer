@@ -8,29 +8,30 @@ import com.subgarden.backend.util.asResourceFile
 import graphql.execution.DataFetcherResult
 import graphql.schema.DataFetcher
 import graphql.schema.StaticDataFetcher
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.features.ContentNegotiation
-import io.ktor.gson.gson
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.request.path
-import io.ktor.request.receive
-import io.ktor.response.respond
-import io.ktor.response.respondFile
-import io.ktor.response.respondText
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.routing
+import io.ktor.http.headers
+import io.ktor.serialization.gson.gson
+import io.ktor.server.application.call
+import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.request.path
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondFile
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.routing
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
 
 const val GRAPHQL_SCHEMA = "schema.graphqls"
 const val VERSION = "0.0.2"
-const val IP_ADDRESS = "192.168.0.10"
+const val IP_ADDRESS = "10.42.13.81"
 const val PORT = "8080"
 
 fun main() {
@@ -55,9 +56,7 @@ fun main() {
         val server = embeddedServer(Netty, port = 8080) {
 
             install(ContentNegotiation) {
-                gson {
-                    setPrettyPrinting()
-                }
+                gson()
             }
 
             routing {
@@ -78,11 +77,11 @@ fun main() {
                     }
                 }
 
-                @Suppress("USELESS_ELVIS")
                 post("/graphql") {
+
                     val request = call.receive<GraphQLRequest>()
-                    val query = request.query ?: ""
-                    val variables = request.variables ?: emptyMap()
+                    val query = request.query
+                    val variables = request.variables
                     val result = handler.execute(query, variables)
 
                     call.respond(result.toSpecification())
@@ -100,10 +99,12 @@ private fun itemFetcher() = "item" to DataFetcher { env ->
     MockData.items.find { it.uuid == itemId }
 }
 
-private fun allItemsFetcher() = "items" to DataFetcher {
+private fun allItemsFetcher() = "items" to DataFetcher { env ->
+    val first: Int? = env.getArgument<Int>("first")
+    val items = if (first != null) MockData.items.take(first) else MockData.items
     DataFetcherResult
         .newResult<List<MockItem>>()
-        .data(MockData.items)
+        .data(items)
         .errors(emptyList())
         .build()
 }

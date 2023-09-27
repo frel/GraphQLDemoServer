@@ -5,6 +5,7 @@ import graphql.execution.DataFetcherExceptionHandler
 import graphql.execution.DataFetcherExceptionHandlerParameters
 import graphql.execution.DataFetcherExceptionHandlerResult
 import org.slf4j.LoggerFactory
+import java.util.concurrent.CompletableFuture
 
 
 class DebugDataFetcherExceptionHandler : DataFetcherExceptionHandler {
@@ -13,14 +14,14 @@ class DebugDataFetcherExceptionHandler : DataFetcherExceptionHandler {
         private val log = LoggerFactory.getLogger(DebugDataFetcherExceptionHandler::class.java)
     }
 
-    override fun onException(handlerParameters: DataFetcherExceptionHandlerParameters): DataFetcherExceptionHandlerResult {
+    override fun handleException(handlerParameters: DataFetcherExceptionHandlerParameters): CompletableFuture<DataFetcherExceptionHandlerResult> {
         val exception = handlerParameters.exception
         val sourceLocation = handlerParameters.sourceLocation
         val path = handlerParameters.path
 
         val error = ExceptionWhileDataFetching(path, exception, sourceLocation)
         log.warn(error.message, exception)
-        return DataFetcherExceptionHandlerResult.newResult().error(error).build()
+        return CompletableFuture.completedFuture(DataFetcherExceptionHandlerResult.newResult().error(error).build())
     }
 
 }
